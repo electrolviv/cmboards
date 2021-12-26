@@ -1,5 +1,6 @@
-#ifndef SERIAL_HPP
-#define SERIAL_HPP
+/* (C) V01G04A81 2021 */
+
+#pragma once
 
 #include "vhperiph.hpp"
 
@@ -23,5 +24,3 @@ private:
 };
 
 extern VHHardwareSerial Serial;
-
-#endif // SERIAL_HPP

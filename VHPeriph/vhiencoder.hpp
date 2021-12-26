@@ -1,5 +1,6 @@
-#ifndef VHIENCODER_HPP
-#define VHIENCODER_HPP
+/* (C) V01G04A81 2021 */
+
+#pragma once
 
 #include "vhperiph.hpp"
 
@@ -33,6 +34,13 @@ public:
 
 private:
 
+    static const char STATE_INC      = 0;   // 00
+    static const char STATE_DEC      = 1;   // 01
+    static const char STATE_STABLE   = 2;   // 10
+    static const char STATE_INVALID  = 3;   // 11
+
+    static const uint8_t enctbl[4];
+
     uint8_t     readpins();
 
     int32_t     _value;
@@ -41,5 +49,3 @@ private:
     void *      _ptrconfig;
     bool        _changed;
 };
-
-#endif // VHIENCODER_HPP

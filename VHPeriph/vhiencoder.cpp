@@ -1,28 +1,15 @@
 #include "vhiencoder.hpp"
 
+#define BYTE4B2(A,B,C,D) ( (A<<6)|(B<<4)|(C<<2)|(D<<0) )
 
 
-static const int8_t encmap[16] = {
+const uint8_t VHIncEncoder::enctbl[] = {
 
-    0,   // 0    0000 STABLE
-    1,   // 1    0001 L
-    -1,  // 2    0010 R
-    0,   // 3    0011 INVALID
+    BYTE4B2( STATE_STABLE  , STATE_DEC     , STATE_INC     , STATE_INVALID   ),
+    BYTE4B2( STATE_INC     , STATE_STABLE  , STATE_INVALID , STATE_DEC       ),
+    BYTE4B2( STATE_DEC     , STATE_INVALID , STATE_STABLE  , STATE_INC       ),
+    BYTE4B2( STATE_INVALID , STATE_INC     , STATE_DEC     , STATE_STABLE    ),
 
-    -1,  // 4    0100 R
-    0,   // 5    0101 STABLE
-    0,   // 6    0110 INVALID
-    1,   // 7    0111 L
-
-    1,   // 8    1000 L
-    0,   // 9    1001 INVALID
-    0,   // 10   1010 STABLE
-    -1,  // 11   1011 R
-
-    0,   // 12   1100 INVALID
-    -1,  // 13   1101 R
-    1,   // 14   1110 L
-    0    // 15   1111 STABLE
 };
 
 
@@ -56,19 +43,25 @@ void VHIncEncoder::begin() {
 
 void VHIncEncoder::tick() {
 
+    // Read PIN A/B levels
     uint8_t encPosCur = readpins();
 
-    // return on same pos
+    // Return on same pos
     if(encPosCur == _encPosOld)
         return;
 
-    uint8_t encval = (_encPosOld << 2) | encPosCur;
+    // Walt through table
+    uint8_t tblbyte = enctbl[_encPosOld];
+    uint8_t tblval  = ( tblbyte >> ( encPosCur << 1 ) );
 
-    _value += encmap[encval];
-    _dir    = encmap[encval] < 0;
+    if(!(tblval & 2)) {
+        if(tblval & 1)  { _value--; _dir=false; }
+        else            { _value++; _dir=true;  }
+        _changed = true;
+    }
 
     _encPosOld = encPosCur;
-    _changed = true;
+
 }
 
 void VHIncEncoder::end() {

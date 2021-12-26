@@ -1,3 +1,5 @@
+/* (C) V01G04A81 2021 */
+
 #pragma once
 
 #include "vhperiph.hpp"
